@@ -1,12 +1,83 @@
 {
+  "home": {
+    "list": false,
+    "lastmod": null,
+    "api":  true,
+    "groups": {
+      "featured_exhibitions": {
+        "page": "exhibitions",
+        "key": "exhibition_id"
+      },
+      "featured_galleries": {
+        "page": "galleries",
+        "key": "galleryid"
+      },
+      "featured_spaces": {
+        "page": "spaces",
+        "key": "spaceid"
+      },
+      "featured_artworks": {
+        "page": "artworks",
+        "key": "artworkid"
+      },
+      "monthly_picks": {
+        "page": "galleries",
+        "key": "galleryid"
+      }
+    }
+  },
   "galleries": {
     "list": true,
     "lastmod": null,
+    "api": true,
     "domain": {
       "joint": "",
       "values": [
         "domain"
       ]
+    }
+  },
+  "artworks": {
+    "list": true,
+    "lastmod": null,
+    "api": true,
+    "domain": {
+      "joint": "-",
+      "values": [
+        "id",
+        "title"
+      ]
+    }
+  },
+  "spaces": {
+    "list": true,
+    "lastmod": null,
+    "api": true,
+    "domain": {
+      "joint": "",
+      "values": [
+        "galleryspaceid"
+      ]
+    }
+  },
+  "exhibitions": {
+    "list": true,
+    "lastmod": null,
+    "api": true,
+    "domain": {
+      "joint": "",
+      "values": [
+        "id"
+      ]
+    }
+  },
+  "contact": {
+    "list": true,
+    "lastmod": null,
+    "api": false,
+    "domain": {
+      "joint": "",
+      "values": []
     }
   }
 }

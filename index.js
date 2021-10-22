@@ -1,10 +1,10 @@
-const path = require('path');
 const chalk = require('chalk');
 const figlet = require('figlet');
 const clear = require('clear');
 const minimist = require('minimist')
-const error = require('./utils/error')
-const dotenv = require('dotenv');
+
+const error = require('./commands/modules/error')
+const env = require('./commands/modules/env');
 
 clear();
 
@@ -14,45 +14,25 @@ console.log(
   )
 );
 
+// App env
+env('./.env');
+
 // Available commands
-const cmdAvail = ['generate', 'version', 'help'];
-const formatsAvail = ['xml', 'json'];
-
-/**
- * Read ENV vars
- * @param website
- * @returns {{}}
- */
-const readEnv = (website = null) => {
-  const envPath = path.resolve(`${ __dirname }/${ website ? (`config/${ website }`) : '' }.env`);
-  const envFileRead = dotenv.config({ path: envPath });
-
-  if (envFileRead.error) {
-    throw envFileRead.error;
-  }
-
-  const env = envFileRead.parsed;
-
-  return Object.keys(env).reduce((prev, next) => {
-    prev[`process.env.${ next }`] = JSON.stringify(env[next]);
-    return prev;
-  }, {});
-};
+const cmdAvail = ['generate', 'upload', 'version', 'help'];
 
 module.exports = () => {
   const args = minimist(process.argv.slice(2));
   const website = String(args.website || args.w || 'upgrade').toLowerCase();
-  const format = String(args.format || args.f || formatsAvail[0]).toLowerCase();
 
   // Default command
   let cmd = args._[0] || 'help';
 
   if (args.version || args.v) {
-    cmd = 'version'
+    cmd = 'version';
   }
 
   if (args.help || args.h) {
-    cmd = 'help'
+    cmd = 'help';
   }
 
   if (true !== cmdAvail.includes(cmd)) {
@@ -60,36 +40,32 @@ module.exports = () => {
     error(`"${ cmd }" is not a valid command!`, true);
   }
 
-  // App and Website ENV vars
-  const envApp = readEnv();
-  const envWebsite = readEnv(website);
-
   // Execute
   const configPath = (args.config || args.c || process.env.CONFIG_PATH) + `${ website }.json`;
-  const outputPath = (args.config || args.c || process.env.OUTPUT_PATH);
+  const envPath = (args.config || args.c || process.env.CONFIG_PATH) + `${ website }.env`;
+  const _u = args.upload || args.u;
+  const upload = _u === true || _u === 'y' || _u === 'Y';
+  let params;
+
+  // ENV vars
+  env(envPath);
+
+  // Params
+  switch (cmd) {
+    case 'generate':
+      params = { configPath, upload };
+      break;
+    case 'upload':
+    default:
+      params = null;
+      break;
+  }
 
   if (cmdAvail.includes(cmd)) {
-    require(`./commands/${ cmd }`)({ configPath, outputPath });
-  } else {
+    require(`./commands/${ cmd }`)(params);
+  }
+  else {
     console.log(chalk.red('YOU SHALL NOT PASS...!'));
     error(`"${ cmd }" is not a valid command!`, true);
   }
-
-  /*switch (cmd) {
-    case 'generate':
-      require('./commands/generate')(website, args, format);
-      break;
-
-    case 'version':
-      require('./commands/version')(website, args);
-      break;
-
-    case 'help':
-      require('./commands/help')(website, args);
-      break;
-
-    default:
-      error(`"${ cmd }" is not a valid command!`, true)
-      break;
-  }*/
 }
